@@ -27,6 +27,10 @@
 - To field is required
 - [Design](https://www.figma.com/file/xV4PSc7axmA1xL7esb7L6V/DevTesting?node-id=0%3A1)
 
+## When done
+
+- Schedule a call in the [calendar](https://calendly.com/qpc/30min)
+
 ## Notes
 
 - ISBAT = I should be able to
