@@ -7,7 +7,7 @@
 - As a user ISBAT see just the contacts that matches the typing (name and email) when i start typing in `To`, `Cc` or `Bcc` field
 - As a user ISBAT click on one of the contact from the autocomplete list and fill the email in the `To`, `Cc` or `Bcc` field
 - As a user ISBAT add a email to `To`, `Cc` or `Bcc` field if i can't find a contact in autocomplete
-- As a user ISBAT save the message to database when I press `Send` button
+- As a user ISBAT save the message to database when I press `Send` button - [optional]
 
 ## Requirements
 
