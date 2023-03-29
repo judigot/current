@@ -7,10 +7,70 @@ interface UserRanks {
   user: User;
 }
 
+interface CarbonCopy {
+  id: string;
+  label: string;
+  reference: React.useRef;
+  handleInput: Function;
+  handleClose: Function;
+}
+
+const CarbonCopy = ({
+  id,
+  label,
+  reference,
+  handleInput,
+  handleClose,
+}: CarbonCopy) => {
+  return (
+    <div
+      className="border-b"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "max-content 1fr max-content",
+      }}
+    >
+      <div className="my-auto ml-auto mr-auto">
+        <span>{label}</span>
+        <span>
+          <span className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer">
+            John Doe
+          </span>
+        </span>
+      </div>
+      <div>
+        <input
+          ref={reference}
+          onChange={handleInput}
+          type="email"
+          name={id}
+          id={id}
+          style={{ width: "100%" }}
+          className="focus:ring-0 border-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          placeholder=""
+        />
+      </div>
+      <div style={{ margin: "auto 0% auto 0%" }}>
+        <span>
+          <span className="cursor-pointer" onClick={handleClose}>
+            Remove
+          </span>
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
   const [filteredUsers, setFilteredUsers] = React.useState<UserRanks>();
-  const toInput = React.useRef<string>("");
+
+  const recipientRef = React.useRef<string>("");
+  const ccRef = React.useRef<string>("");
+  const bccRef = React.useRef<string>("");
+
+  const [isCcVisible, setIsCcVisible] = React.useState<boolean>(false);
+  const [isBccVisible, setIsBccVisible] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     // Initial render
@@ -22,14 +82,14 @@ export const Form = () => {
     })();
   }, []);
 
-  const isRankingEnabled = !true;
+  const isRankingEnabled = true;
 
   const sortByRank = (userRanks: UserRanks[]) => {
     const sortByRank = {
       key: "rank",
       orderBy: "desc",
     };
-    userRanks.sort((a: any, b: any) => {
+    userRanks.sort((a: UserRanks, b: UserRanks) => {
       return (
         (sortByRank.orderBy === "asc" ? 1 : -1) * // Negate result for descending
         (a[sortByRank.key] - b[sortByRank.key])
@@ -38,88 +98,166 @@ export const Form = () => {
     return userRanks;
   };
 
+  const handleToInput = () => {
+    // Destructure useRef
+    let {
+      current: { value: needle },
+    } = recipientRef;
+    if (needle) {
+      // Filter username & email
+
+      const passed: {
+        [key: number]: UserRanks;
+      } = {};
+      users.map((row: User, i: number, array: User[]) => {
+        // Filter username & email
+
+        // Values to be matched
+        const haystack = [row.name, row.email];
+
+        // Convert to uppercase to match accurately
+        let rowContents = haystack.join(" ").toUpperCase();
+
+        const haystackValues = rowContents.split(" ");
+
+        needle = needle.replace(/\s+/g, "").toUpperCase();
+
+        haystackValues.map((value) => {
+          if (value.includes(needle)) {
+            if (isRankingEnabled) {
+              // With ranking
+              if (!passed[row.id]) {
+                passed[row.id] = {
+                  rank: 1,
+                  user: users[i],
+                };
+              } else {
+                passed[row.id].rank++;
+              }
+            } else {
+              // Without ranking
+              passed[row.id] = users[i];
+            }
+          }
+        });
+      });
+      const ranked = sortByRank(Object.values(passed));
+      const finalUsers = ranked.map(
+        ({ rank, ...retainedAttributes }) => retainedAttributes.user
+      );
+      if (isRankingEnabled) {
+        setFilteredUsers(finalUsers || []);
+      } else {
+        setFilteredUsers(finalUsers || []);
+      }
+    } else {
+      setFilteredUsers(users);
+    }
+  };
+
+  const handleCcInput = () => {
+    alert("Cc");
+  };
+
+  const handleBccInput = () => {
+    alert("Bcc");
+  };
+
   return (
     <form onSubmit={() => {}}>
-      <div className="mb-4">
+      <div className="mb-4 w-full">
         <label htmlFor="email" className="sr-only">
           Email
         </label>
-        <input
-          ref={toInput}
-          onChange={(e) => {
-            // Destructure useRef
-            let {
-              current: { value: needle },
-            } = toInput;
-            if (needle) {
-              // Filter username & email
 
-              const passed: {
-                [key: number]: UserRanks;
-              } = {};
-              users.map((row: User, i: number, array: User[]) => {
-                // Filter username & email
-
-                // Values to be matched
-                const haystack = [row.name, row.email];
-
-                // Convert to uppercase to match accurately
-                let rowContents = haystack.join(" ").toUpperCase();
-
-                const haystackValues = rowContents.split(" ");
-
-                needle = needle.replace(/\s+/g, "").toUpperCase();
-
-                haystackValues.map((value) => {
-                  if (value.includes(needle)) {
-                    if (isRankingEnabled) {
-                      // With ranking
-                      if (!passed[row.id]) {
-                        passed[row.id] = {
-                          rank: 1,
-                          user: users[i],
-                        };
-                      } else {
-                        passed[row.id].rank++;
-                      }
-                    } else {
-                      // Without ranking
-                      passed[row.id] = users[i];
-                    }
-                  }
-                });
-              });
-              if (isRankingEnabled) {
-                setFilteredUsers(sortByRank(Object.values(passed)) || []);
-              } else {
-                setFilteredUsers(Object.values(passed) || []);
-              }
-            } else {
-              setFilteredUsers([]);
-            }
+        <div
+          className="border-b"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "max-content 1fr max-content",
           }}
-          type="email"
-          name="email"
-          id="email"
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          placeholder="you@example.com"
-        />
+        >
+          <div className="my-auto ml-auto mr-auto">
+            <span>To</span>
+            <span>
+              <span className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer">
+                John Doe
+              </span>
+            </span>
+          </div>
+          <div>
+            <input
+              ref={recipientRef}
+              onChange={handleToInput}
+              onFocus={handleToInput}
+              onBlur={() => {
+                setFilteredUsers([]);
+              }}
+              type="email"
+              name="email"
+              id="email"
+              style={{ width: "100%" }}
+              className="focus:ring-0 border-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              placeholder="Recipient"
+            />
+          </div>
+          <div style={{ margin: "auto 0% auto 0%" }}>
+            <span>
+              {!isCcVisible && (
+                <span
+                  className="hover:underline cursor-pointer"
+                  onClick={() => {
+                    setIsCcVisible(!isCcVisible);
+                  }}
+                >
+                  Cc
+                </span>
+              )}
+              {!isCcVisible && !isBccVisible && " / "}
+              {!isBccVisible && (
+                <span
+                  className="hover:underline cursor-pointer"
+                  onClick={() => {
+                    setIsBccVisible(!isBccVisible);
+                  }}
+                >
+                  Bcc
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
+
+        {isCcVisible && (
+          <CarbonCopy
+            id={"cc"}
+            label={"Cc"}
+            reference={ccRef}
+            handleInput={handleCcInput}
+            handleClose={() => {
+              setIsCcVisible(!isCcVisible);
+            }}
+          />
+        )}
+
+        {isBccVisible && (
+          <CarbonCopy
+            id={"bcc"}
+            label={"Bcc"}
+            reference={bccRef}
+            handleInput={handleBccInput}
+            handleClose={() => {
+              setIsBccVisible(!isBccVisible);
+            }}
+          />
+        )}
       </div>
 
-      {!isRankingEnabled &&
+      {isRankingEnabled &&
         filteredUsers?.map((row: User, i: number, array: User[]) => {
           return (
             <p key={i}>
               {row.name} {row.email}
-            </p>
-          );
-        })}
-
-      {isRankingEnabled &&
-        filteredUsers?.map((row: UserRanks, i: number, array: User[]) => {
-          return (
-            <p key={i}>
-              {row.user.name} {row.user.email}
             </p>
           );
         })}
