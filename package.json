@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npm install -g meteor",
-    "dev": "meteor run",
+    "dev": "npx meteor run",
     "start": "ROOT_URL=$SANDBOX_URL LANG=C LC_ALL=C $HOME/.meteor/meteor run --exclude-archs web.browser.legacy,web.cordova",
     "test": "meteor test --once --driver-package meteortesting:mocha",
     "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
