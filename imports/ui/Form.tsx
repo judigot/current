@@ -14,17 +14,29 @@ interface Recipient {
   onChange: Function;
   onFocus: Function;
   onBlur: Function;
+  onSelectUser: Function;
   actions: React.JSX;
+  selectedUsers: User[];
+  filteredUsers: User[] | null;
+}
+
+enum RecipientTypes {
+  to = "to",
+  cc = "cc",
+  bcc = "bcc",
 }
 
 const Recipient = ({
   id,
+  selectedUsers,
   label,
   reference,
   onChange,
   onFocus,
   onBlur,
+  onSelectUser,
   actions,
+  filteredUsers,
 }: Recipient) => {
   return (
     <div
@@ -37,9 +49,20 @@ const Recipient = ({
       <div className="my-auto ml-auto mr-auto">
         <span>{label}</span>
         <span>
-          <span className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer">
-            John Doe
-          </span>
+          {selectedUsers &&
+            selectedUsers.length !== 0 &&
+            selectedUsers.map((row, i, array) => {
+              return (
+                <span
+                  className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
+                  onClick={() => {
+                    alert(row.id);
+                  }}
+                >
+                  {JSON.stringify(row)}
+                </span>
+              );
+            })}
         </span>
       </div>
       <div>
@@ -55,6 +78,27 @@ const Recipient = ({
           className="focus:ring-0 border-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           placeholder=""
         />
+        {filteredUsers && filteredUsers.length !== 0 && (
+          <div
+            className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
+            style={{ position: "absolute", top: "80px" }}
+          >
+            {filteredUsers.map((row: User, i: number, array: User[]) => {
+              return (
+                <div
+                  key={i}
+                  className="p-1"
+                  onMouseDown={() => {
+                    onSelectUser(id, row.id);
+                  }}
+                >
+                  <p className="font-semibold">{row.name}</p>
+                  <p>{row.email}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <div style={{ margin: "auto 0% auto 0%" }}>{actions()}</div>
     </div>
@@ -64,11 +108,11 @@ const Recipient = ({
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
-  const [recipients, setRecipients] = React.useState<User[]>();
-  const [ccRecipients, setcccRecipients] = React.useState<User[]>();
-  const [bccRecipients, setBccRecipients] = React.useState<User[]>();
+  const [recipients, setRecipients] = React.useState<User[]>([]);
+  const [ccRecipients, setcccRecipients] = React.useState<User[]>([]);
+  const [bccRecipients, setBccRecipients] = React.useState<User[]>([]);
 
-  const [filteredUsers, setFilteredUsers] = React.useState<UserRanks>();
+  const [filteredUsers, setFilteredUsers] = React.useState<User>(null);
 
   const recipientRef = React.useRef<string>("");
   const ccRef = React.useRef<string>("");
@@ -152,9 +196,9 @@ export const Form = () => {
         ({ rank, ...retainedAttributes }) => retainedAttributes.user
       );
       if (isRankingEnabled) {
-        setFilteredUsers(finalUsers || []);
+        setFilteredUsers(finalUsers || null);
       } else {
-        setFilteredUsers(finalUsers || []);
+        setFilteredUsers(finalUsers || null);
       }
     } else {
       setFilteredUsers(users);
@@ -169,6 +213,22 @@ export const Form = () => {
     alert("Bcc");
   };
 
+  const handleSelectUser = (recipientType: RecipientTypes, userID: number) => {
+    switch (recipientType) {
+      case "to":
+        const tempUsersHolder = structuredClone(recipients);
+        tempUsersHolder.push({ id: userID });
+        setRecipients(tempUsersHolder);
+        break;
+      case "cc":
+        break;
+      case "bcc":
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <form onSubmit={() => {}}>
       <div className="mb-4 w-full">
@@ -178,13 +238,16 @@ export const Form = () => {
 
         <Recipient
           id={"to"}
+          selectedUsers={recipients}
           label={"To"}
           reference={recipientRef}
           onChange={handleToInput}
           onFocus={handleToInput}
           onBlur={() => {
-            setFilteredUsers([]);
+            setFilteredUsers(null);
           }}
+          onSelectUser={handleSelectUser}
+          filteredUsers={filteredUsers}
           actions={() => {
             return (
               <span>
@@ -217,11 +280,14 @@ export const Form = () => {
         {isCcVisible && (
           <Recipient
             id={"cc"}
+            selectedUsers={ccRecipients}
             label={"Cc"}
             reference={ccRef}
             onChange={handleCcInput}
             onFocus={() => {}}
             onBlur={() => {}}
+            onSelectUser={handleSelectUser}
+            filteredUsers={filteredUsers}
             actions={() => {
               return (
                 <span>
@@ -231,7 +297,8 @@ export const Form = () => {
                       setIsCcVisible(!isCcVisible);
                     }}
                   >
-                    Remove
+                    {/* prettier-ignore */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
                   </span>
                 </span>
               );
@@ -242,11 +309,14 @@ export const Form = () => {
         {isBccVisible && (
           <Recipient
             id={"bcc"}
+            selectedUsers={bccRecipients}
             label={"Bcc"}
             reference={bccRef}
             onChange={handleBccInput}
             onFocus={() => {}}
             onBlur={() => {}}
+            onSelectUser={handleSelectUser}
+            filteredUsers={filteredUsers}
             actions={() => {
               return (
                 <span>
@@ -256,7 +326,8 @@ export const Form = () => {
                       setIsBccVisible(!isBccVisible);
                     }}
                   >
-                    Remove
+                    {/* prettier-ignore */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
                   </span>
                 </span>
               );
@@ -264,15 +335,6 @@ export const Form = () => {
           />
         )}
       </div>
-
-      {isRankingEnabled &&
-        filteredUsers?.map((row: User, i: number, array: User[]) => {
-          return (
-            <p key={i}>
-              {row.name} {row.email}
-            </p>
-          );
-        })}
 
       <div className="mb-4">
         <label htmlFor="body" className="sr-only">
