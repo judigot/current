@@ -54,6 +54,7 @@ const Recipient = ({
             selectedUsers.map((row, i, array) => {
               return (
                 <span
+                  key={row.id}
                   className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
                   onClick={() => {
                     alert(row.id);
