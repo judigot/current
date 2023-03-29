@@ -7,7 +7,7 @@ interface UserRanks {
   user: User;
 }
 
-interface CarbonCopy {
+interface Recipient {
   id: string;
   label: string;
   reference: React.useRef;
@@ -25,7 +25,7 @@ const Recipient = ({
   onFocus,
   onBlur,
   actions,
-}: CarbonCopy) => {
+}: Recipient) => {
   return (
     <div
       className="border-b"
