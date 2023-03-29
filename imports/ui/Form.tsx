@@ -11,16 +11,20 @@ interface CarbonCopy {
   id: string;
   label: string;
   reference: React.useRef;
-  handleInput: Function;
-  handleClose: Function;
+  onChange: Function;
+  onFocus: Function;
+  onBlur: Function;
+  actions: React.JSX;
 }
 
-const CarbonCopy = ({
+const Recipient = ({
   id,
   label,
   reference,
-  handleInput,
-  handleClose,
+  onChange,
+  onFocus,
+  onBlur,
+  actions,
 }: CarbonCopy) => {
   return (
     <div
@@ -41,7 +45,9 @@ const CarbonCopy = ({
       <div>
         <input
           ref={reference}
-          onChange={handleInput}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
           type="email"
           name={id}
           id={id}
@@ -50,19 +56,18 @@ const CarbonCopy = ({
           placeholder=""
         />
       </div>
-      <div style={{ margin: "auto 0% auto 0%" }}>
-        <span>
-          <span className="cursor-pointer" onClick={handleClose}>
-            Remove
-          </span>
-        </span>
-      </div>
+      <div style={{ margin: "auto 0% auto 0%" }}>{actions()}</div>
     </div>
   );
 };
 
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
+
+  const [recipients, setRecipients] = React.useState<User[]>();
+  const [ccRecipients, setcccRecipients] = React.useState<User[]>();
+  const [bccRecipients, setBccRecipients] = React.useState<User[]>();
+
   const [filteredUsers, setFilteredUsers] = React.useState<UserRanks>();
 
   const recipientRef = React.useRef<string>("");
@@ -99,6 +104,7 @@ export const Form = () => {
   };
 
   const handleToInput = () => {
+    ``;
     // Destructure useRef
     let {
       current: { value: needle },
@@ -170,84 +176,90 @@ export const Form = () => {
           Email
         </label>
 
-        <div
-          className="border-b"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "max-content 1fr max-content",
+        <Recipient
+          id={"to"}
+          label={"To"}
+          reference={recipientRef}
+          onChange={handleToInput}
+          onFocus={handleToInput}
+          onBlur={() => {
+            setFilteredUsers([]);
           }}
-        >
-          <div className="my-auto ml-auto mr-auto">
-            <span>To</span>
-            <span>
-              <span className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer">
-                John Doe
+          actions={() => {
+            return (
+              <span>
+                {!isCcVisible && (
+                  <span
+                    className="hover:underline cursor-pointer"
+                    onClick={() => {
+                      setIsCcVisible(!isCcVisible);
+                    }}
+                  >
+                    Cc
+                  </span>
+                )}
+                {!isCcVisible && !isBccVisible && " / "}
+                {!isBccVisible && (
+                  <span
+                    className="hover:underline cursor-pointer"
+                    onClick={() => {
+                      setIsBccVisible(!isBccVisible);
+                    }}
+                  >
+                    Bcc
+                  </span>
+                )}
               </span>
-            </span>
-          </div>
-          <div>
-            <input
-              ref={recipientRef}
-              onChange={handleToInput}
-              onFocus={handleToInput}
-              onBlur={() => {
-                setFilteredUsers([]);
-              }}
-              type="email"
-              name="email"
-              id="email"
-              style={{ width: "100%" }}
-              className="focus:ring-0 border-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              placeholder="Recipient"
-            />
-          </div>
-          <div style={{ margin: "auto 0% auto 0%" }}>
-            <span>
-              {!isCcVisible && (
-                <span
-                  className="hover:underline cursor-pointer"
-                  onClick={() => {
-                    setIsCcVisible(!isCcVisible);
-                  }}
-                >
-                  Cc
-                </span>
-              )}
-              {!isCcVisible && !isBccVisible && " / "}
-              {!isBccVisible && (
-                <span
-                  className="hover:underline cursor-pointer"
-                  onClick={() => {
-                    setIsBccVisible(!isBccVisible);
-                  }}
-                >
-                  Bcc
-                </span>
-              )}
-            </span>
-          </div>
-        </div>
+            );
+          }}
+        />
 
         {isCcVisible && (
-          <CarbonCopy
+          <Recipient
             id={"cc"}
             label={"Cc"}
             reference={ccRef}
-            handleInput={handleCcInput}
-            handleClose={() => {
-              setIsCcVisible(!isCcVisible);
+            onChange={handleCcInput}
+            onFocus={() => {}}
+            onBlur={() => {}}
+            actions={() => {
+              return (
+                <span>
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setIsCcVisible(!isCcVisible);
+                    }}
+                  >
+                    Remove
+                  </span>
+                </span>
+              );
             }}
           />
         )}
 
         {isBccVisible && (
-          <CarbonCopy
+          <Recipient
             id={"bcc"}
             label={"Bcc"}
             reference={bccRef}
-            handleInput={handleBccInput}
-            handleClose={() => {
-              setIsBccVisible(!isBccVisible);
+            onChange={handleBccInput}
+            onFocus={() => {}}
+            onBlur={() => {}}
+            actions={() => {
+              return (
+                <span>
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setIsBccVisible(!isBccVisible);
+                    }}
+                  >
+                    Remove
+                  </span>
+                </span>
+              );
             }}
           />
         )}
