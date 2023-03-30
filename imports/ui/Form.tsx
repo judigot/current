@@ -11,10 +11,8 @@ interface Recipient {
   id: string;
   label: string;
   inputRef: React.useRef;
-  selectedUsers: User[];
-  filteredUsers: User[] | null;
-  onFocus: Function;
-  onBlur: Function;
+  selectedUsers: number[];
+  allUsers: User[];
   onChange: Function;
   onSelectUser: Function;
   actions: React.JSX;
@@ -31,13 +29,12 @@ const Recipient = ({
   label,
   inputRef,
   selectedUsers,
-  filteredUsers,
-  onFocus,
-  onBlur,
+  allUsers,
   onChange,
   onSelectUser,
   actions,
 }: Recipient) => {
+  const [isFocused, setIsFocused] = React.useState<boolean>(false);
   return (
     <div
       className="border-b"
@@ -49,20 +46,23 @@ const Recipient = ({
       <div className="my-auto">
         <span>{label}</span>
         <span>
-          {selectedUsers &&
-            selectedUsers.length !== 0 &&
-            selectedUsers.map((row, i, array) => {
-              return (
-                <span
-                  key={i}
-                  className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
-                  onClick={() => {
-                    alert(row.id);
-                  }}
-                >
-                  {JSON.stringify(row)}
-                </span>
-              );
+          {allUsers &&
+            allUsers.length !== 0 &&
+            allUsers.map((row, i, array) => {
+              console.log(`${selectedUsers}___${row.id}`);
+              if (selectedUsers.includes(row.id)) {
+                return (
+                  <span
+                    key={row.id}
+                    className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
+                    onClick={() => {
+                      alert(row.id);
+                    }}
+                  >
+                    {row.name}
+                  </span>
+                );
+              }
             })}
         </span>
         <span>
@@ -70,8 +70,14 @@ const Recipient = ({
             <input
               ref={inputRef}
               onChange={onChange}
-              onFocus={onFocus}
-              onBlur={onBlur}
+              onFocus={() => {
+                setIsFocused(true);
+              }}
+              onBlur={() => {
+                setIsFocused(false);
+              }}
+              // onFocus={onFocus}
+              // onBlur={onBlur}
               type="email"
               name={id}
               id={id}
@@ -79,27 +85,29 @@ const Recipient = ({
               className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
               placeholder=""
             />
-            {filteredUsers && filteredUsers.length !== 0 && (
+            {isFocused && allUsers && allUsers.length !== 0 && (
               <ul
                 className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
                 style={{ position: "absolute" }}
               >
-                {filteredUsers.map((row: User, i: number, array: User[]) => {
-                  return (
-                    <li
-                      key={i}
-                      className="p-1"
-                      onMouseDown={() => {
-                        onSelectUser(id, row.id);
-                        setTimeout(() => {
-                          inputRef.current.focus();
-                        });
-                      }}
-                    >
-                      <div className="font-semibold">{row.name}</div>
-                      <div>{row.email}</div>
-                    </li>
-                  );
+                {allUsers.map((row: User, i: number, array: User[]) => {
+                  if (!selectedUsers.includes(row.id)) {
+                    return (
+                      <li
+                        key={row.id}
+                        className="p-1"
+                        onMouseDown={() => {
+                          onSelectUser(id, row.id, inputRef);
+                          setTimeout(() => {
+                            inputRef.current.focus();
+                          });
+                        }}
+                      >
+                        <div className="font-semibold">{row.name}</div>
+                        <div>{row.email}</div>
+                      </li>
+                    );
+                  }
                 })}
               </ul>
             )}
@@ -117,11 +125,13 @@ const Recipient = ({
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
-  const [recipients, setRecipients] = React.useState<User[]>([]);
+  const [recipients, setRecipients] = React.useState<number[]>([]);
   const [ccRecipients, setcccRecipients] = React.useState<User[]>([]);
   const [bccRecipients, setBccRecipients] = React.useState<User[]>([]);
 
   const [filteredUsers, setFilteredUsers] = React.useState<User>(null);
+  const [filteredCcUsers, setFilteredCcUsers] = React.useState<User>(null);
+  const [filteredBccUsers, setFilteredBccUsers] = React.useState<User>(null);
 
   const recipientRef = React.useRef<string>("");
   const ccRef = React.useRef<string>("");
@@ -157,7 +167,6 @@ export const Form = () => {
   };
 
   const handleToInput = () => {
-    ``;
     // Destructure useRef
     let {
       current: { value: needle },
@@ -222,12 +231,26 @@ export const Form = () => {
     alert("Bcc");
   };
 
-  const handleSelectUser = (recipientType: RecipientTypes, userID: number) => {
+  const handleSelectUser = (
+    recipientType: RecipientTypes,
+    userID: number,
+    inputRef: React.useRef
+  ) => {
     switch (recipientType) {
       case "to":
-        const tempUsersHolder = structuredClone(recipients);
-        tempUsersHolder.push({ id: userID });
-        setRecipients(tempUsersHolder);
+        // Remove selected user from recipients
+        const tempUsersHolder = structuredClone(users);
+        tempUsersHolder.map((value: User, i, array) => {
+          if (value.id === userID) {
+            tempUsersHolder.splice(i, 1);
+          }
+        });
+        inputRef.current.value = "";
+        setFilteredUsers(tempUsersHolder);
+
+        const tempRecipientsHolder = structuredClone(recipients);
+        tempRecipientsHolder.push(userID);
+        setRecipients(tempRecipientsHolder);
         break;
       case "cc":
         break;
@@ -244,17 +267,12 @@ export const Form = () => {
         <label htmlFor="email" className="sr-only">
           Email
         </label>
-
         <Recipient
           id={"to"}
           label={"To"}
           inputRef={recipientRef}
           selectedUsers={recipients}
-          filteredUsers={filteredUsers}
-          onFocus={handleToInput}
-          onBlur={() => {
-            setFilteredUsers(null);
-          }}
+          allUsers={users}
           onChange={handleToInput}
           onSelectUser={handleSelectUser}
           actions={() => {
@@ -292,9 +310,7 @@ export const Form = () => {
             label={"Cc"}
             inputRef={ccRef}
             selectedUsers={ccRecipients}
-            filteredUsers={filteredUsers}
-            onFocus={() => {}}
-            onBlur={() => {}}
+            allUsers={users}
             onChange={handleCcInput}
             onSelectUser={handleSelectUser}
             actions={() => {
@@ -318,14 +334,12 @@ export const Form = () => {
         {isBccVisible && (
           <Recipient
             id={"bcc"}
-            selectedUsers={bccRecipients}
             label={"Bcc"}
             inputRef={bccRef}
+            selectedUsers={bccRecipients}
+            allUsers={users}
             onChange={handleBccInput}
-            onFocus={() => {}}
-            onBlur={() => {}}
             onSelectUser={handleSelectUser}
-            filteredUsers={filteredUsers}
             actions={() => {
               return (
                 <span>
