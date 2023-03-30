@@ -37,6 +37,7 @@ const Recipient = ({
   actions,
 }: Recipient) => {
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
+  const usersSource = inputRef.current.value ? filteredUsers : allUsers;
   return (
     <div
       className="border-b"
@@ -85,12 +86,12 @@ const Recipient = ({
               style={{ width: "100%" }}
               className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
             />
-            {isFocused && filteredUsers && filteredUsers.length !== 0 && (
+            {isFocused && usersSource && usersSource.length !== 0 && (
               <ul
                 className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
                 style={{ position: "absolute" }}
               >
-                {filteredUsers.map((row: User, i: number, array: User[]) => {
+                {usersSource.map((row: User, i: number, array: User[]) => {
                   if (!selectedUsers.includes(row.id)) {
                     return (
                       <li
