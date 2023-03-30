@@ -234,7 +234,14 @@ export const Form = () => {
     }
   };
 
-  const handleAddEmail = (recipientType: RecipientTypes, email: string) => {
+  const handleAddEmail = (
+    inputRef: React.useRef,
+    recipientType: RecipientTypes
+  ) => {
+    /* Passed the actual ref instead of the
+    email to lessen parameters and reset values and focus easily */
+    const email = inputRef.current?.value;
+
     switch (recipientType) {
       case "to":
         {
@@ -258,6 +265,10 @@ export const Form = () => {
         }
         break;
     }
+    inputRef.current.value = "";
+    setTimeout(() => {
+      inputRef.current.focus();
+    });
   };
 
   return (

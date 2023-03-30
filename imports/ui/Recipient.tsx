@@ -154,7 +154,7 @@ const Recipient = ({
                       isEmailAlreadyAdded ? " pointer-events-none" : ""
                     }`}
                     onMouseDown={() => {
-                      handleAddEmail(recipientType, email);
+                      handleAddEmail(inputRef, recipientType);
                     }}
                   >
                     <div>
