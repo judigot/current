@@ -133,15 +133,23 @@ export const Form = () => {
   const handleSelectUser = (
     recipientType: RecipientTypes,
     userID: number,
+    email: string,
     inputRef: React.useRef
   ) => {
     // Remove selected user from recipients
     const tempUsersHolder = structuredClone(users);
     tempUsersHolder.map((value: User, i, array) => {
+      // ID
       if (value.id === userID) {
         tempUsersHolder.splice(i, 1);
       }
+
+      // Email
+      // if (value.email === email) {
+      //   tempUsersHolder.splice(email, 1);
+      // }
     });
+
     inputRef.current.value = "";
 
     //========EXPERIMENTAL========//
@@ -180,7 +188,8 @@ export const Form = () => {
         {
           setFilteredToUsers(tempUsersHolder);
           const tempRecipientsHolder = structuredClone(toRecipients);
-          tempRecipientsHolder.push(userID);
+          // tempRecipientsHolder.push(userID);
+          tempRecipientsHolder.push(email);
           setToRecipients(tempRecipientsHolder);
         }
         break;
@@ -188,7 +197,8 @@ export const Form = () => {
         {
           setFilteredCcUsers(tempUsersHolder);
           const tempRecipientsHolder = structuredClone(ccRecipients);
-          tempRecipientsHolder.push(userID);
+          // tempRecipientsHolder.push(userID);
+          tempRecipientsHolder.push(email);
           setCcRecipients(tempRecipientsHolder);
         }
         break;
@@ -196,7 +206,8 @@ export const Form = () => {
         {
           setFilteredCcUsers(tempUsersHolder);
           const tempRecipientsHolder = structuredClone(bccRecipients);
-          tempRecipientsHolder.push(userID);
+          // tempRecipientsHolder.push(userID);
+          tempRecipientsHolder.push(email);
           setBccRecipients(tempRecipientsHolder);
         }
         break;
@@ -223,20 +234,42 @@ export const Form = () => {
     }
   };
 
+  const handleAddEmail = (recipientType: RecipientTypes, email: string) => {
+    switch (recipientType) {
+      case "to":
+        {
+          const stateCopy = structuredClone(toRecipients);
+          stateCopy.push(email);
+          setToRecipients(stateCopy);
+        }
+        break;
+      case "cc":
+        {
+          const stateCopy = structuredClone(ccRecipients);
+          stateCopy.push(email);
+          setCcRecipients(stateCopy);
+        }
+        break;
+      case "bcc":
+        {
+          const stateCopy = structuredClone(bccRecipients);
+          stateCopy.push(email);
+          setBccRecipients(stateCopy);
+        }
+        break;
+    }
+  };
+
   return (
     users && (
       <form onSubmit={() => {}}>
-        {JSON.stringify(toRecipients)}
-        {JSON.stringify(ccRecipients)}
-        {JSON.stringify(bccRecipients)}
-
         <div className="mb-4">
           <label htmlFor="email" className="sr-only">
             Email
           </label>
           {
             <Recipient
-              id={"to"}
+              recipientType={"to"}
               label={"To"}
               inputRef={toRef}
               filteredUsers={filteredToUsers}
@@ -245,6 +278,7 @@ export const Form = () => {
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
               handleRemoveUser={handleRemoveUser}
+              handleAddEmail={handleAddEmail}
               actions={() => {
                 return (
                   <span>
@@ -252,7 +286,7 @@ export const Form = () => {
                       <span
                         className="hover:underline cursor-pointer"
                         onClick={() => {
-                          setIsCcFieldVisible(!isCcFieldVisible);
+                          setIsCcFieldVisible(true);
                         }}
                       >
                         Cc
@@ -263,7 +297,7 @@ export const Form = () => {
                       <span
                         className="hover:underline cursor-pointer"
                         onClick={() => {
-                          setIsBccFieldVisible(!isBccFieldVisible);
+                          setIsBccFieldVisible(true);
                         }}
                       >
                         Bcc
@@ -277,7 +311,7 @@ export const Form = () => {
 
           {isCcFieldVisible && (
             <Recipient
-              id={"cc"}
+              recipientType={"cc"}
               label={"Cc"}
               inputRef={ccRef}
               filteredUsers={filteredCcUsers}
@@ -286,13 +320,15 @@ export const Form = () => {
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
               handleRemoveUser={handleRemoveUser}
+              handleAddEmail={handleAddEmail}
               actions={() => {
                 return (
                   <span>
                     <span
                       className="cursor-pointer"
                       onClick={() => {
-                        setIsCcFieldVisible(!isCcFieldVisible);
+                        setIsCcFieldVisible(false);
+                        setCcRecipients([]);
                       }}
                     >
                       {/* prettier-ignore */}
@@ -306,7 +342,7 @@ export const Form = () => {
 
           {isBccFieldVisible && (
             <Recipient
-              id={"bcc"}
+              recipientType={"bcc"}
               label={"Bcc"}
               inputRef={bccRef}
               filteredUsers={filteredBccUsers}
@@ -315,6 +351,7 @@ export const Form = () => {
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
               handleRemoveUser={handleRemoveUser}
+              handleAddEmail={handleAddEmail}
               actions={() => {
                 return (
                   <span>
@@ -322,6 +359,7 @@ export const Form = () => {
                       className="cursor-pointer"
                       onClick={() => {
                         setIsBccFieldVisible(!isBccFieldVisible);
+                        setBccRecipients([]);
                       }}
                     >
                       {/* prettier-ignore */}

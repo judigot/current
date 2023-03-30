@@ -27,15 +27,16 @@ declare global {
     };
   }
   interface Recipient {
-    id: string;
+    recipientType: string;
     label: string;
     inputRef: React.useRef;
     filteredUsers: User[] | null;
-    selectedUsers: number[];
+    selectedUsers: string[];
     allUsers: User[];
     onChange: Function;
     onSelectUser: Function;
     handleRemoveUser: Function;
+    handleAddEmail: Function;
     actions: React.JSX;
   }
 
