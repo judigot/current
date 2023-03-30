@@ -43,7 +43,9 @@ const Recipient = ({
                         gridTemplateColumns: "repeat(2, max-content)",
                       }}
                     >
-                      <div>{row.email}</div>
+                      <div>
+                        {row.name}, {row.email}
+                      </div>
                       <div className="cursor-pointer">
                         {/* prettier-ignore */}
                         <svg
