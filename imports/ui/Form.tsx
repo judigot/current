@@ -7,6 +7,8 @@ import Users from "../getUsers";
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
+  const [isToFieldEmpty, setIsToFieldEmpty] = React.useState<boolean>(false);
+
   const [isCcFieldVisible, setIsCcFieldVisible] =
     React.useState<boolean>(false);
   const [isBccFieldVisible, setIsBccFieldVisible] =
@@ -271,9 +273,34 @@ export const Form = () => {
     });
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (toRecipients.length === 0) {
+      setIsToFieldEmpty(true);
+    } else {
+      setIsToFieldEmpty(false);
+    }
+  };
+
   return (
     users && (
-      <form onSubmit={() => {}}>
+      <form
+        onSubmit={(e) => {
+          handleSubmit(e);
+        }}
+      >
+        {isToFieldEmpty && (
+          <div
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong class="font-bold">Warning!&nbsp;</strong>
+            <span class="block sm:inline">
+              At least one recipient is required.
+            </span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3"></span>
+          </div>
+        )}
         <div className="mb-4">
           <label htmlFor="email" className="sr-only">
             Email
