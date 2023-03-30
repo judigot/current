@@ -1,145 +1,28 @@
 import React from "react";
 
-import Users, { User } from "../getUsers";
+import Recipient from "./Recipient";
 
-interface UserRanks {
-  rank: number;
-  user: User;
-}
-
-interface Recipient {
-  id: string;
-  label: string;
-  inputRef: React.useRef;
-  filteredUsers: User[] | null;
-  selectedUsers: number[];
-  allUsers: User[];
-  onChange: Function;
-  onSelectUser: Function;
-  actions: React.JSX;
-}
-
-enum RecipientTypes {
-  to = "to",
-  cc = "cc",
-  bcc = "bcc",
-}
-
-const Recipient = ({
-  id,
-  label,
-  inputRef,
-  filteredUsers,
-  selectedUsers,
-  allUsers,
-  onChange,
-  onSelectUser,
-  actions,
-}: Recipient) => {
-  const [isFocused, setIsFocused] = React.useState<boolean>(false);
-  const usersSource = inputRef.current?.value ? filteredUsers : allUsers;
-  return (
-    <div
-      className="border-b"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(200px, 1fr) max-content",
-        position: "relative",
-      }}
-    >
-      <div className="my-auto">
-        <span>{label}</span>
-        <span>
-          {allUsers &&
-            allUsers.map((row, i, array) => {
-              if (selectedUsers.includes(row.id)) {
-                return (
-                  <span
-                    key={row.id}
-                    className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
-                    onClick={() => {
-                      alert(row.id);
-                    }}
-                  >
-                    {row.name}
-                  </span>
-                );
-              }
-            })}
-        </span>
-        <span>
-          <div className="inline-block">
-            <input
-              ref={inputRef}
-              onChange={onChange}
-              onFocus={() => {
-                setIsFocused(true);
-              }}
-              onBlur={() => {
-                setIsFocused(false);
-              }}
-              // onFocus={onFocus}
-              // onBlur={onBlur}
-              type="email"
-              name={id}
-              id={id}
-              style={{ width: "100%" }}
-              className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </span>
-        {isFocused &&
-          usersSource?.length !== 0 &&
-          // Hides dropdown when all users are selected
-          usersSource?.length !== selectedUsers.length && (
-            <ul className="z-10 absolute w-full cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80">
-              {usersSource?.map((row: User, i: number, array: User[]) => {
-                if (!selectedUsers.includes(row.id)) {
-                  return (
-                    <li
-                      key={row.id}
-                      className="p-1"
-                      onMouseDown={() => {
-                        onSelectUser(id, row.id, inputRef);
-                        setTimeout(() => {
-                          inputRef.current.focus();
-                        });
-                      }}
-                    >
-                      <div className="font-semibold">{row.name}</div>
-                      <div>{row.email}</div>
-                    </li>
-                  );
-                }
-              })}
-            </ul>
-          )}
-      </div>
-
-      <div className="inline-block" style={{ margin: "auto 0% auto 0%" }}>
-        {actions()}
-      </div>
-    </div>
-  );
-};
+import Users from "../getUsers";
 
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
-  const [recipients, setRecipients] = React.useState<number[]>([]);
-  const [ccRecipients, setcccRecipients] = React.useState<User[]>([]);
+  const [isCcFieldVisible, setIsCcFieldVisible] =
+    React.useState<boolean>(false);
+  const [isBccFieldVisible, setIsBccFieldVisible] =
+    React.useState<boolean>(false);
+
+  const [toRecipients, setToRecipients] = React.useState<number[]>([]);
+  const [ccRecipients, setCcRecipients] = React.useState<User[]>([]);
   const [bccRecipients, setBccRecipients] = React.useState<User[]>([]);
 
-  const [filteredUsers, setFilteredUsers] = React.useState<User>(null);
+  const [filteredToUsers, setFilteredToUsers] = React.useState<User>(null);
   const [filteredCcUsers, setFilteredCcUsers] = React.useState<User>(null);
   const [filteredBccUsers, setFilteredBccUsers] = React.useState<User>(null);
 
   const recipientRef = React.useRef<string>("");
   const ccRef = React.useRef<string>("");
   const bccRef = React.useRef<string>("");
-
-  const [isCcVisible, setIsCcVisible] = React.useState<boolean>(false);
-  const [isBccVisible, setIsBccVisible] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     // Initial render
@@ -167,11 +50,11 @@ export const Form = () => {
     return userRanks;
   };
 
-  const handleToInput = () => {
+  const handleDropdown = (id: string, inputRef: React.useRef) => {
     // Destructure useRef
     let {
       current: { value: needle },
-    } = recipientRef;
+    } = inputRef;
     if (needle) {
       // Filter username & email
 
@@ -214,22 +97,37 @@ export const Form = () => {
       const finalUsers = ranked.map(
         ({ rank, ...retainedAttributes }) => retainedAttributes.user
       );
-      if (isRankingEnabled) {
-        setFilteredUsers(finalUsers || null);
-      } else {
-        setFilteredUsers(finalUsers || null);
+
+      switch (id) {
+        case "to":
+          setFilteredToUsers(finalUsers || null);
+          break;
+        case "cc":
+          console.log("cc");
+          setFilteredCcUsers(finalUsers || null);
+          break;
+        case "bcc":
+          console.log("bcc");
+          setFilteredBccUsers(finalUsers || null);
+          break;
+        default:
+          break;
       }
     } else {
-      setFilteredUsers(users);
+      switch (id) {
+        case "to":
+          setFilteredToUsers(users);
+          break;
+        case "cc":
+          setFilteredCcUsers(users);
+          break;
+        case "bcc":
+          setFilteredBccUsers(users);
+          break;
+        default:
+          break;
+      }
     }
-  };
-
-  const handleCcInput = () => {
-    alert("Cc");
-  };
-
-  const handleBccInput = () => {
-    alert("Bcc");
   };
 
   const handleSelectUser = (
@@ -237,84 +135,117 @@ export const Form = () => {
     userID: number,
     inputRef: React.useRef
   ) => {
-    switch (recipientType) {
-      case "to":
-        // Remove selected user from recipients
-        const tempUsersHolder = structuredClone(users);
-        tempUsersHolder.map((value: User, i, array) => {
-          if (value.id === userID) {
-            tempUsersHolder.splice(i, 1);
-          }
-        });
-        inputRef.current.value = "";
-        setFilteredUsers(tempUsersHolder);
+    // Remove selected user from recipients
+    const tempUsersHolder = structuredClone(users);
+    tempUsersHolder.map((value: User, i, array) => {
+      if (value.id === userID) {
+        tempUsersHolder.splice(i, 1);
+      }
+    });
+    inputRef.current.value = "";
 
-        const tempRecipientsHolder = structuredClone(recipients);
+    //========EXPERIMENTAL========//
+    /* Assign state setters to a variable */
+    let tempRecipientsHolder, setFilteredUsers, setRecipients;
+    switch (recipientType) {
+      case "to": {
+        tempRecipientsHolder = structuredClone(toRecipients);
+        setFilteredUsers = setFilteredToUsers; // ?
+        setRecipients = setToRecipients; // ?
+      }
+      case "cc": {
+        tempRecipientsHolder = structuredClone(ccRecipients);
+        setFilteredUsers = setFilteredCcUsers; // ?
+        setRecipients = setCcRecipients; // ?
+      }
+      case "bcc": {
+        tempRecipientsHolder = structuredClone(bccRecipients);
+        setFilteredUsers = setFilteredBccUsers; // ?
+        setRecipients = setBccRecipients; // ?
+      }
+    }
+    tempRecipientsHolder.push(userID);
+    setFilteredUsers(tempUsersHolder); // ?
+    setRecipients(tempRecipientsHolder); // ?
+    //========EXPERIMENTAL========//
+
+    switch (recipientType) {
+      case "to": {
+        setFilteredToUsers(tempUsersHolder);
+        const tempRecipientsHolder = structuredClone(toRecipients);
         tempRecipientsHolder.push(userID);
-        setRecipients(tempRecipientsHolder);
-        break;
-      case "cc":
-        break;
-      case "bcc":
-        break;
-      default:
-        break;
+        setToRecipients(tempRecipientsHolder);
+      }
+      case "cc": {
+        setFilteredCcUsers(tempUsersHolder);
+        const tempRecipientsHolder = structuredClone(ccRecipients);
+        tempRecipientsHolder.push(userID);
+        setCcRecipients(tempRecipientsHolder);
+      }
+      case "bcc": {
+        setFilteredCcUsers(tempUsersHolder);
+        const tempRecipientsHolder = structuredClone(bccRecipients);
+        tempRecipientsHolder.push(userID);
+        setBccRecipients(tempRecipientsHolder);
+      }
     }
   };
 
   return (
     <form onSubmit={() => {}}>
-      <div className="mb-4 w-full">
+      <div className="mb-4">
         <label htmlFor="email" className="sr-only">
           Email
         </label>
-        <Recipient
-          id={"to"}
-          label={"To"}
-          inputRef={recipientRef}
-          filteredUsers={filteredUsers}
-          selectedUsers={recipients}
-          allUsers={users}
-          onChange={handleToInput}
-          onSelectUser={handleSelectUser}
-          actions={() => {
-            return (
-              <span>
-                {!isCcVisible && (
-                  <span
-                    className="hover:underline cursor-pointer"
-                    onClick={() => {
-                      setIsCcVisible(!isCcVisible);
-                    }}
-                  >
-                    Cc
-                  </span>
-                )}
-                {!isCcVisible && !isBccVisible && " / "}
-                {!isBccVisible && (
-                  <span
-                    className="hover:underline cursor-pointer"
-                    onClick={() => {
-                      setIsBccVisible(!isBccVisible);
-                    }}
-                  >
-                    Bcc
-                  </span>
-                )}
-              </span>
-            );
-          }}
-        />
+        {users && (
+          <Recipient
+            id={"to"}
+            label={"To"}
+            inputRef={recipientRef}
+            filteredUsers={filteredToUsers}
+            selectedUsers={toRecipients}
+            allUsers={users}
+            onChange={handleDropdown}
+            onSelectUser={handleSelectUser}
+            actions={() => {
+              return (
+                <span>
+                  {!isCcFieldVisible && (
+                    <span
+                      className="hover:underline cursor-pointer"
+                      onClick={() => {
+                        setIsCcFieldVisible(!isCcFieldVisible);
+                      }}
+                    >
+                      Cc
+                    </span>
+                  )}
+                  {!isCcFieldVisible && !isBccFieldVisible && " / "}
+                  {!isBccFieldVisible && (
+                    <span
+                      className="hover:underline cursor-pointer"
+                      onClick={() => {
+                        setIsBccFieldVisible(!isBccFieldVisible);
+                      }}
+                    >
+                      Bcc
+                    </span>
+                  )}
+                </span>
+              );
+            }}
+          />
+        )}
 
-        {isCcVisible && (
+        {users && isCcFieldVisible && (
           <Recipient
             id={"cc"}
             label={"Cc"}
             inputRef={ccRef}
-            filteredUsers={recipients}
+            filteredUsers={filteredCcUsers}
             selectedUsers={ccRecipients}
             allUsers={users}
-            onChange={handleCcInput}
+            onChange={handleDropdown}
             onSelectUser={handleSelectUser}
             actions={() => {
               return (
@@ -322,7 +253,7 @@ export const Form = () => {
                   <span
                     className="cursor-pointer"
                     onClick={() => {
-                      setIsCcVisible(!isCcVisible);
+                      setIsCcFieldVisible(!isCcFieldVisible);
                     }}
                   >
                     {/* prettier-ignore */}
@@ -334,15 +265,15 @@ export const Form = () => {
           />
         )}
 
-        {isBccVisible && (
+        {users && isBccFieldVisible && (
           <Recipient
             id={"bcc"}
             label={"Bcc"}
             inputRef={bccRef}
-            filteredUsers={recipients}
+            filteredUsers={filteredBccUsers}
             selectedUsers={bccRecipients}
             allUsers={users}
-            onChange={handleBccInput}
+            onChange={handleDropdown}
             onSelectUser={handleSelectUser}
             actions={() => {
               return (
@@ -350,7 +281,7 @@ export const Form = () => {
                   <span
                     className="cursor-pointer"
                     onClick={() => {
-                      setIsBccVisible(!isBccVisible);
+                      setIsBccFieldVisible(!isBccFieldVisible);
                     }}
                   >
                     {/* prettier-ignore */}
