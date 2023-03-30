@@ -9,6 +9,7 @@ const Recipient = ({
   allUsers,
   onChange,
   onSelectUser,
+  handleRemoveUser,
   actions,
 }: Recipient) => {
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
@@ -34,12 +35,24 @@ const Recipient = ({
                 return (
                   <div
                     key={row.id}
-                    className="inline-block m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
-                    onClick={() => {
-                      alert(row.id);
-                    }}
+                    className="inline-block m-1 p-1 rounded-md bg-gray-200"
                   >
-                    {row.email}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, max-content)",
+                      }}
+                    >
+                      <div>{row.email}</div>
+                      <div className="cursor-pointer">
+                        {/* prettier-ignore */}
+                        <svg
+                        onClick={() => {
+                          handleRemoveUser(id, row.id);
+                        }
+                        } xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
+                      </div>
+                    </div>
                   </div>
                 );
               }

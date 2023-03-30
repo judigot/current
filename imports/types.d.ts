@@ -35,6 +35,7 @@ declare global {
     allUsers: User[];
     onChange: Function;
     onSelectUser: Function;
+    handleRemoveUser: Function;
     actions: React.JSX;
   }
 

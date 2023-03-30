@@ -20,7 +20,7 @@ export const Form = () => {
   const [filteredCcUsers, setFilteredCcUsers] = React.useState<User>(null);
   const [filteredBccUsers, setFilteredBccUsers] = React.useState<User>(null);
 
-  const recipientRef = React.useRef<string>("");
+  const toRef = React.useRef<string>("");
   const ccRef = React.useRef<string>("");
   const bccRef = React.useRef<string>("");
 
@@ -203,6 +203,26 @@ export const Form = () => {
     }
   };
 
+  const handleRemoveUser = (recipientType: RecipientTypes, userID: number) => {
+    switch (recipientType) {
+      case "to": {
+        setToRecipients(toRecipients.filter((val: number) => val !== userID));
+      }
+      case "cc": {
+        setCcRecipients(ccRecipients.filter((val: number) => val !== userID));
+      }
+      case "bcc":
+        {
+          setBccRecipients(
+            bccRecipients.filter((val: number) => val !== userID)
+          );
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     users && (
       <form onSubmit={() => {}}>
@@ -218,12 +238,13 @@ export const Form = () => {
             <Recipient
               id={"to"}
               label={"To"}
-              inputRef={recipientRef}
+              inputRef={toRef}
               filteredUsers={filteredToUsers}
               selectedUsers={toRecipients}
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
+              handleRemoveUser={handleRemoveUser}
               actions={() => {
                 return (
                   <span>
@@ -264,6 +285,7 @@ export const Form = () => {
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
+              handleRemoveUser={handleRemoveUser}
               actions={() => {
                 return (
                   <span>
@@ -292,6 +314,7 @@ export const Form = () => {
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
+              handleRemoveUser={handleRemoveUser}
               actions={() => {
                 return (
                   <span>
