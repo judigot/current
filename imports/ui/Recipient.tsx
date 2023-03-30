@@ -35,7 +35,7 @@ const Recipient = ({
                 return (
                   <div
                     key={row.id}
-                    className="inline-block m-1 p-1 rounded-md bg-gray-200"
+                    className="font-semibold inline-block m-1 p-1 rounded-full text-sm bg-indigo-600 text-white"
                   >
                     <div
                       style={{
