@@ -192,128 +192,130 @@ export const Form = () => {
   };
 
   return (
-    <form onSubmit={() => {}}>
-      <div className="mb-4">
-        <label htmlFor="email" className="sr-only">
-          Email
-        </label>
-        {users && (
-          <Recipient
-            id={"to"}
-            label={"To"}
-            inputRef={recipientRef}
-            filteredUsers={filteredToUsers}
-            selectedUsers={toRecipients}
-            allUsers={users}
-            onChange={handleDropdown}
-            onSelectUser={handleSelectUser}
-            actions={() => {
-              return (
-                <span>
-                  {!isCcFieldVisible && (
+    users && (
+      <form onSubmit={() => {}}>
+        <div className="mb-4">
+          <label htmlFor="email" className="sr-only">
+            Email
+          </label>
+          {
+            <Recipient
+              id={"to"}
+              label={"To"}
+              inputRef={recipientRef}
+              filteredUsers={filteredToUsers}
+              selectedUsers={toRecipients}
+              allUsers={users}
+              onChange={handleDropdown}
+              onSelectUser={handleSelectUser}
+              actions={() => {
+                return (
+                  <span>
+                    {!isCcFieldVisible && (
+                      <span
+                        className="hover:underline cursor-pointer"
+                        onClick={() => {
+                          setIsCcFieldVisible(!isCcFieldVisible);
+                        }}
+                      >
+                        Cc
+                      </span>
+                    )}
+                    {!isCcFieldVisible && !isBccFieldVisible && " / "}
+                    {!isBccFieldVisible && (
+                      <span
+                        className="hover:underline cursor-pointer"
+                        onClick={() => {
+                          setIsBccFieldVisible(!isBccFieldVisible);
+                        }}
+                      >
+                        Bcc
+                      </span>
+                    )}
+                  </span>
+                );
+              }}
+            />
+          }
+
+          {isCcFieldVisible && (
+            <Recipient
+              id={"cc"}
+              label={"Cc"}
+              inputRef={ccRef}
+              filteredUsers={filteredCcUsers}
+              selectedUsers={ccRecipients}
+              allUsers={users}
+              onChange={handleDropdown}
+              onSelectUser={handleSelectUser}
+              actions={() => {
+                return (
+                  <span>
                     <span
-                      className="hover:underline cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => {
                         setIsCcFieldVisible(!isCcFieldVisible);
                       }}
                     >
-                      Cc
+                      {/* prettier-ignore */}
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
                     </span>
-                  )}
-                  {!isCcFieldVisible && !isBccFieldVisible && " / "}
-                  {!isBccFieldVisible && (
+                  </span>
+                );
+              }}
+            />
+          )}
+
+          {isBccFieldVisible && (
+            <Recipient
+              id={"bcc"}
+              label={"Bcc"}
+              inputRef={bccRef}
+              filteredUsers={filteredBccUsers}
+              selectedUsers={bccRecipients}
+              allUsers={users}
+              onChange={handleDropdown}
+              onSelectUser={handleSelectUser}
+              actions={() => {
+                return (
+                  <span>
                     <span
-                      className="hover:underline cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => {
                         setIsBccFieldVisible(!isBccFieldVisible);
                       }}
                     >
-                      Bcc
+                      {/* prettier-ignore */}
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
                     </span>
-                  )}
-                </span>
-              );
-            }}
-          />
-        )}
-
-        {users && isCcFieldVisible && (
-          <Recipient
-            id={"cc"}
-            label={"Cc"}
-            inputRef={ccRef}
-            filteredUsers={filteredCcUsers}
-            selectedUsers={ccRecipients}
-            allUsers={users}
-            onChange={handleDropdown}
-            onSelectUser={handleSelectUser}
-            actions={() => {
-              return (
-                <span>
-                  <span
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setIsCcFieldVisible(!isCcFieldVisible);
-                    }}
-                  >
-                    {/* prettier-ignore */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
                   </span>
-                </span>
-              );
-            }}
+                );
+              }}
+            />
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="body" className="sr-only">
+            Body
+          </label>
+          <textarea
+            rows={4}
+            name="body"
+            id="body"
+            className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
+            defaultValue={""}
+            placeholder="Type your message here…"
           />
-        )}
+        </div>
 
-        {users && isBccFieldVisible && (
-          <Recipient
-            id={"bcc"}
-            label={"Bcc"}
-            inputRef={bccRef}
-            filteredUsers={filteredBccUsers}
-            selectedUsers={bccRecipients}
-            allUsers={users}
-            onChange={handleDropdown}
-            onSelectUser={handleSelectUser}
-            actions={() => {
-              return (
-                <span>
-                  <span
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setIsBccFieldVisible(!isBccFieldVisible);
-                    }}
-                  >
-                    {/* prettier-ignore */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /> </svg>
-                  </span>
-                </span>
-              );
-            }}
-          />
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="body" className="sr-only">
-          Body
-        </label>
-        <textarea
-          rows={4}
-          name="body"
-          id="body"
-          className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
-          defaultValue={""}
-          placeholder="Type your message here…"
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="rounded-md bg-indigo-600 py-1.5 px-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      >
-        Send
-      </button>
-    </form>
+        <button
+          type="submit"
+          className="rounded-md bg-indigo-600 py-1.5 px-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Send
+        </button>
+      </form>
+    )
   );
 };
