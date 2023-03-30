@@ -366,7 +366,7 @@ export const Form = () => {
                       className="cursor-pointer"
                       onClick={() => {
                         setIsCcFieldVisible(false);
-                        setCcRecipients([]);
+                        // setCcRecipients([]);
                       }}
                     >
                       {/* prettier-ignore */}
@@ -397,7 +397,7 @@ export const Form = () => {
                       className="cursor-pointer"
                       onClick={() => {
                         setIsBccFieldVisible(!isBccFieldVisible);
-                        setBccRecipients([]);
+                        // setBccRecipients([]);
                       }}
                     >
                       {/* prettier-ignore */}
