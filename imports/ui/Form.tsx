@@ -10,14 +10,14 @@ interface UserRanks {
 interface Recipient {
   id: string;
   label: string;
-  reference: React.useRef;
-  onChange: Function;
-  onFocus: Function;
-  onBlur: Function;
-  onSelectUser: Function;
-  actions: React.JSX;
+  inputRef: React.useRef;
   selectedUsers: User[];
   filteredUsers: User[] | null;
+  onFocus: Function;
+  onBlur: Function;
+  onChange: Function;
+  onSelectUser: Function;
+  actions: React.JSX;
 }
 
 enum RecipientTypes {
@@ -28,25 +28,25 @@ enum RecipientTypes {
 
 const Recipient = ({
   id,
-  selectedUsers,
   label,
-  reference,
-  onChange,
+  inputRef,
+  selectedUsers,
+  filteredUsers,
   onFocus,
   onBlur,
+  onChange,
   onSelectUser,
   actions,
-  filteredUsers,
 }: Recipient) => {
   return (
     <div
       className="border-b"
       style={{
         display: "grid",
-        gridTemplateColumns: "max-content 1fr max-content",
+        gridTemplateColumns: "minmax(200px, 1fr) max-content",
       }}
     >
-      <div className="my-auto ml-auto mr-auto">
+      <div className="my-auto">
         <span>{label}</span>
         <span>
           {selectedUsers &&
@@ -54,7 +54,7 @@ const Recipient = ({
             selectedUsers.map((row, i, array) => {
               return (
                 <span
-                  key={row.id}
+                  key={i}
                   className="m-1 p-1 rounded-md bg-gray-200 cursor-pointer"
                   onClick={() => {
                     alert(row.id);
@@ -65,43 +65,51 @@ const Recipient = ({
               );
             })}
         </span>
-      </div>
-      <div>
-        <input
-          ref={reference}
-          onChange={onChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          type="email"
-          name={id}
-          id={id}
-          style={{ width: "100%" }}
-          className="focus:ring-0 border-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          placeholder=""
-        />
-        {filteredUsers && filteredUsers.length !== 0 && (
-          <div
-            className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
-            style={{ position: "absolute", top: "80px" }}
-          >
-            {filteredUsers.map((row: User, i: number, array: User[]) => {
-              return (
-                <div
-                  key={i}
-                  className="p-1"
-                  onMouseDown={() => {
-                    onSelectUser(id, row.id);
-                  }}
-                >
-                  <p className="font-semibold">{row.name}</p>
-                  <p>{row.email}</p>
-                </div>
-              );
-            })}
+        <span>
+          <div className="inline-block">
+            <input
+              ref={inputRef}
+              onChange={onChange}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              type="email"
+              name={id}
+              id={id}
+              style={{ width: "100%" }}
+              className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+              placeholder=""
+            />
+            {filteredUsers && filteredUsers.length !== 0 && (
+              <ul
+                className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
+                style={{ position: "absolute" }}
+              >
+                {filteredUsers.map((row: User, i: number, array: User[]) => {
+                  return (
+                    <li
+                      key={i}
+                      className="p-1"
+                      onMouseDown={() => {
+                        onSelectUser(id, row.id);
+                        setTimeout(() => {
+                          inputRef.current.focus();
+                        });
+                      }}
+                    >
+                      <div className="font-semibold">{row.name}</div>
+                      <div>{row.email}</div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
-        )}
+        </span>
       </div>
-      <div style={{ margin: "auto 0% auto 0%" }}>{actions()}</div>
+
+      <div className="inline-block" style={{ margin: "auto 0% auto 0%" }}>
+        {actions()}
+      </div>
     </div>
   );
 };
@@ -239,16 +247,16 @@ export const Form = () => {
 
         <Recipient
           id={"to"}
-          selectedUsers={recipients}
           label={"To"}
-          reference={recipientRef}
-          onChange={handleToInput}
+          inputRef={recipientRef}
+          selectedUsers={recipients}
+          filteredUsers={filteredUsers}
           onFocus={handleToInput}
           onBlur={() => {
             setFilteredUsers(null);
           }}
+          onChange={handleToInput}
           onSelectUser={handleSelectUser}
-          filteredUsers={filteredUsers}
           actions={() => {
             return (
               <span>
@@ -281,14 +289,14 @@ export const Form = () => {
         {isCcVisible && (
           <Recipient
             id={"cc"}
-            selectedUsers={ccRecipients}
             label={"Cc"}
-            reference={ccRef}
-            onChange={handleCcInput}
+            inputRef={ccRef}
+            selectedUsers={ccRecipients}
+            filteredUsers={filteredUsers}
             onFocus={() => {}}
             onBlur={() => {}}
+            onChange={handleCcInput}
             onSelectUser={handleSelectUser}
-            filteredUsers={filteredUsers}
             actions={() => {
               return (
                 <span>
@@ -312,7 +320,7 @@ export const Form = () => {
             id={"bcc"}
             selectedUsers={bccRecipients}
             label={"Bcc"}
-            reference={bccRef}
+            inputRef={bccRef}
             onChange={handleBccInput}
             onFocus={() => {}}
             onBlur={() => {}}
