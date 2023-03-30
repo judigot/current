@@ -11,6 +11,7 @@ interface Recipient {
   id: string;
   label: string;
   inputRef: React.useRef;
+  filteredUsers: User[] | null;
   selectedUsers: number[];
   allUsers: User[];
   onChange: Function;
@@ -28,6 +29,7 @@ const Recipient = ({
   id,
   label,
   inputRef,
+  filteredUsers,
   selectedUsers,
   allUsers,
   onChange,
@@ -49,7 +51,6 @@ const Recipient = ({
           {allUsers &&
             allUsers.length !== 0 &&
             allUsers.map((row, i, array) => {
-              console.log(`${selectedUsers}___${row.id}`);
               if (selectedUsers.includes(row.id)) {
                 return (
                   <span
@@ -83,14 +84,13 @@ const Recipient = ({
               id={id}
               style={{ width: "100%" }}
               className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-              placeholder=""
             />
-            {isFocused && allUsers && allUsers.length !== 0 && (
+            {isFocused && filteredUsers && filteredUsers.length !== 0 && (
               <ul
                 className="cursor-pointer bg-slate-800 text-white rounded-md p-3 h-min max-h-80 overflow-y-scroll w-80"
                 style={{ position: "absolute" }}
               >
-                {allUsers.map((row: User, i: number, array: User[]) => {
+                {filteredUsers.map((row: User, i: number, array: User[]) => {
                   if (!selectedUsers.includes(row.id)) {
                     return (
                       <li
@@ -271,6 +271,7 @@ export const Form = () => {
           id={"to"}
           label={"To"}
           inputRef={recipientRef}
+          filteredUsers={filteredUsers}
           selectedUsers={recipients}
           allUsers={users}
           onChange={handleToInput}
@@ -309,6 +310,7 @@ export const Form = () => {
             id={"cc"}
             label={"Cc"}
             inputRef={ccRef}
+            filteredUsers={recipients}
             selectedUsers={ccRecipients}
             allUsers={users}
             onChange={handleCcInput}
@@ -336,6 +338,7 @@ export const Form = () => {
             id={"bcc"}
             label={"Bcc"}
             inputRef={bccRef}
+            filteredUsers={recipients}
             selectedUsers={bccRecipients}
             allUsers={users}
             onChange={handleBccInput}
