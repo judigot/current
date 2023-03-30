@@ -14,9 +14,9 @@ export const Form = () => {
   const [isBccFieldVisible, setIsBccFieldVisible] =
     React.useState<boolean>(false);
 
-  const [toRecipients, setToRecipients] = React.useState<number[]>([]);
-  const [ccRecipients, setCcRecipients] = React.useState<User[]>([]);
-  const [bccRecipients, setBccRecipients] = React.useState<User[]>([]);
+  const [to, setTo] = React.useState<number[]>([]);
+  const [cc, setCC] = React.useState<User[]>([]);
+  const [bcc, setBCC] = React.useState<User[]>([]);
 
   const [filteredToUsers, setFilteredToUsers] = React.useState<User>(null);
   const [filteredCcUsers, setFilteredCcUsers] = React.useState<User>(null);
@@ -25,6 +25,8 @@ export const Form = () => {
   const toRef = React.useRef<string>("");
   const ccRef = React.useRef<string>("");
   const bccRef = React.useRef<string>("");
+  const subjectRef = React.useRef<string>("");
+  const bodyRef = React.useRef<string>("");
 
   React.useEffect(() => {
     // Initial render
@@ -72,9 +74,13 @@ export const Form = () => {
         // Convert to uppercase to match accurately
         let rowContents = haystack.join(" ").toUpperCase();
 
-        const haystackValues = rowContents.split(" ");
+        //==========EXPERIMENTAL==========//
+        // const haystackValues = rowContents.split(" ");
+        // needle = needle.replace(/\s+/g, "").toUpperCase();
+        //==========EXPERIMENTAL==========//
 
-        needle = needle.replace(/\s+/g, "").toUpperCase();
+        const haystackValues = [rowContents];
+        needle = needle.toUpperCase();
 
         haystackValues.map((value) => {
           if (value.includes(needle)) {
@@ -105,11 +111,9 @@ export const Form = () => {
           setFilteredToUsers(finalUsers || null);
           break;
         case "cc":
-          console.log("cc");
           setFilteredCcUsers(finalUsers || null);
           break;
         case "bcc":
-          console.log("bcc");
           setFilteredBccUsers(finalUsers || null);
           break;
         default:
@@ -189,28 +193,28 @@ export const Form = () => {
       case "to":
         {
           setFilteredToUsers(tempUsersHolder);
-          const tempRecipientsHolder = structuredClone(toRecipients);
+          const tempRecipientsHolder = structuredClone(to);
           // tempRecipientsHolder.push(userID);
           tempRecipientsHolder.push(email);
-          setToRecipients(tempRecipientsHolder);
+          setTo(tempRecipientsHolder);
         }
         break;
       case "cc":
         {
           setFilteredCcUsers(tempUsersHolder);
-          const tempRecipientsHolder = structuredClone(ccRecipients);
+          const tempRecipientsHolder = structuredClone(cc);
           // tempRecipientsHolder.push(userID);
           tempRecipientsHolder.push(email);
-          setCcRecipients(tempRecipientsHolder);
+          setCC(tempRecipientsHolder);
         }
         break;
       case "bcc":
         {
           setFilteredCcUsers(tempUsersHolder);
-          const tempRecipientsHolder = structuredClone(bccRecipients);
+          const tempRecipientsHolder = structuredClone(bcc);
           // tempRecipientsHolder.push(userID);
           tempRecipientsHolder.push(email);
-          setBccRecipients(tempRecipientsHolder);
+          setBCC(tempRecipientsHolder);
         }
         break;
     }
@@ -218,17 +222,19 @@ export const Form = () => {
 
   const handleRemoveUser = (recipientType: RecipientTypes, userID: number) => {
     switch (recipientType) {
-      case "to": {
-        setToRecipients(toRecipients.filter((val: number) => val !== userID));
-      }
-      case "cc": {
-        setCcRecipients(ccRecipients.filter((val: number) => val !== userID));
-      }
+      case "to":
+        {
+          setTo(to.filter((val: number) => val !== userID));
+        }
+        break;
+      case "cc":
+        {
+          setCC(cc.filter((val: number) => val !== userID));
+        }
+        break;
       case "bcc":
         {
-          setBccRecipients(
-            bccRecipients.filter((val: number) => val !== userID)
-          );
+          setBCC(bcc.filter((val: number) => val !== userID));
         }
         break;
       default:
@@ -247,23 +253,23 @@ export const Form = () => {
     switch (recipientType) {
       case "to":
         {
-          const stateCopy = structuredClone(toRecipients);
+          const stateCopy = structuredClone(to);
           stateCopy.push(email);
-          setToRecipients(stateCopy);
+          setTo(stateCopy);
         }
         break;
       case "cc":
         {
-          const stateCopy = structuredClone(ccRecipients);
+          const stateCopy = structuredClone(cc);
           stateCopy.push(email);
-          setCcRecipients(stateCopy);
+          setCC(stateCopy);
         }
         break;
       case "bcc":
         {
-          const stateCopy = structuredClone(bccRecipients);
+          const stateCopy = structuredClone(bcc);
           stateCopy.push(email);
-          setBccRecipients(stateCopy);
+          setBCC(stateCopy);
         }
         break;
     }
@@ -275,9 +281,34 @@ export const Form = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (toRecipients.length === 0) {
+    if (to.length === 0) {
       setIsToFieldEmpty(true);
     } else {
+      const subject = subjectRef.current.value;
+      const body = bodyRef.current.value;
+
+      if (subject && body) {
+        const data = {
+          to,
+        };
+
+        if (isCcFieldVisible && cc.length) data["cc"] = cc;
+        if (isBccFieldVisible && bcc.length) data["bcc"] = bcc;
+        if (subject) data["subject"] = subject;
+        if (body) data["body"] = body;
+
+        alert(`Email was successfully sent!\n${JSON.stringify(data, null, 2)}
+        `);
+      }
+
+      if (!subject && !body) {
+        if (
+          confirm("This message has no subject or text in the body. Continue?")
+        ) {
+          alert("Email was successfully sent.");
+        }
+      }
+
       setIsToFieldEmpty(false);
     }
   };
@@ -291,14 +322,14 @@ export const Form = () => {
       >
         {isToFieldEmpty && (
           <div
-            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
             role="alert"
           >
-            <strong class="font-bold">Warning!&nbsp;</strong>
-            <span class="block sm:inline">
+            <strong className="font-bold">Warning!&nbsp;</strong>
+            <span className="block sm:inline">
               At least one recipient is required.
             </span>
-            <span class="absolute top-0 bottom-0 right-0 px-4 py-3"></span>
+            <span className="absolute top-0 bottom-0 right-0 px-4 py-3"></span>
           </div>
         )}
         <div className="mb-4">
@@ -311,7 +342,7 @@ export const Form = () => {
               label={"To"}
               inputRef={toRef}
               filteredUsers={filteredToUsers}
-              selectedUsers={toRecipients}
+              selectedUsers={to}
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
@@ -353,7 +384,7 @@ export const Form = () => {
               label={"Cc"}
               inputRef={ccRef}
               filteredUsers={filteredCcUsers}
-              selectedUsers={ccRecipients}
+              selectedUsers={cc}
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
@@ -384,7 +415,7 @@ export const Form = () => {
               label={"Bcc"}
               inputRef={bccRef}
               filteredUsers={filteredBccUsers}
-              selectedUsers={bccRecipients}
+              selectedUsers={bcc}
               allUsers={users}
               onChange={handleDropdown}
               onSelectUser={handleSelectUser}
@@ -410,16 +441,39 @@ export const Form = () => {
           )}
         </div>
 
+        <div className="border-b">
+          <div>
+            <span>Subject</span>
+            <input
+              ref={subjectRef}
+              onChange={() => {}}
+              onFocus={() => {}}
+              onBlur={() => {}}
+              // onFocus={onFocus}
+              // onBlur={onBlur}
+              type="text"
+              name="subject"
+              id="subject"
+              // style={{ width: "100%" }}
+              className="border-transparent focus:border-transparent focus:ring-0 py-1.5 text-gray-900  ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+
+        <br />
+        <br />
+
         <div className="mb-4">
           <label htmlFor="body" className="sr-only">
             Body
           </label>
           <textarea
+            ref={bodyRef}
             rows={4}
             name="body"
             id="body"
             className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
-            defaultValue={""}
+            defaultValue=""
             placeholder="Type your message here…"
           />
         </div>
