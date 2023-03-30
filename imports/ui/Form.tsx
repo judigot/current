@@ -146,54 +146,70 @@ export const Form = () => {
 
     //========EXPERIMENTAL========//
     /* Assign state setters to a variable */
-    // let tempRecipientsHolder, setFilteredUsers, setRecipients;
-    // switch (recipientType) {
-    //   case "to": {
-    //     tempRecipientsHolder = structuredClone(toRecipients);
-    //     setFilteredUsers = setFilteredToUsers; // ?
-    //     setRecipients = setToRecipients; // ?
-    //   }
-    //   case "cc": {
-    //     tempRecipientsHolder = structuredClone(ccRecipients);
-    //     setFilteredUsers = setFilteredCcUsers; // ?
-    //     setRecipients = setCcRecipients; // ?
-    //   }
-    //   case "bcc": {
-    //     tempRecipientsHolder = structuredClone(bccRecipients);
-    //     setFilteredUsers = setFilteredBccUsers; // ?
-    //     setRecipients = setBccRecipients; // ?
-    //   }
-    // }
-    // tempRecipientsHolder.push(userID);
-    // setFilteredUsers(tempUsersHolder); // ?
-    // setRecipients(tempRecipientsHolder); // ?
+    let tempRecipientsHolder, setFilteredUsers, setRecipients;
+    switch (recipientType) {
+      case "to":
+        {
+          tempRecipientsHolder = structuredClone(toRecipients);
+          setFilteredUsers = setFilteredToUsers; // ?
+          setRecipients = setToRecipients; // ?
+        }
+        break;
+      case "cc":
+        {
+          tempRecipientsHolder = structuredClone(ccRecipients);
+          setFilteredUsers = setFilteredCcUsers; // ?
+          setRecipients = setCcRecipients; // ?
+        }
+        break;
+      case "bcc":
+        {
+          tempRecipientsHolder = structuredClone(bccRecipients);
+          setFilteredUsers = setFilteredBccUsers; // ?
+          setRecipients = setBccRecipients; // ?
+        }
+        break;
+    }
+    tempRecipientsHolder.push(userID);
+    setFilteredUsers(tempUsersHolder); // ?
+    setRecipients(tempRecipientsHolder); // ?
     //========EXPERIMENTAL========//
 
     switch (recipientType) {
-      case "to": {
-        setFilteredToUsers(tempUsersHolder);
-        const tempRecipientsHolder = structuredClone(toRecipients);
-        tempRecipientsHolder.push(userID);
-        setToRecipients(tempRecipientsHolder);
-      }
-      case "cc": {
-        setFilteredCcUsers(tempUsersHolder);
-        const tempRecipientsHolder = structuredClone(ccRecipients);
-        tempRecipientsHolder.push(userID);
-        setCcRecipients(tempRecipientsHolder);
-      }
-      case "bcc": {
-        setFilteredCcUsers(tempUsersHolder);
-        const tempRecipientsHolder = structuredClone(bccRecipients);
-        tempRecipientsHolder.push(userID);
-        setBccRecipients(tempRecipientsHolder);
-      }
+      case "to":
+        {
+          setFilteredToUsers(tempUsersHolder);
+          const tempRecipientsHolder = structuredClone(toRecipients);
+          tempRecipientsHolder.push(userID);
+          setToRecipients(tempRecipientsHolder);
+        }
+        break;
+      case "cc":
+        {
+          setFilteredCcUsers(tempUsersHolder);
+          const tempRecipientsHolder = structuredClone(ccRecipients);
+          tempRecipientsHolder.push(userID);
+          setCcRecipients(tempRecipientsHolder);
+        }
+        break;
+      case "bcc":
+        {
+          setFilteredCcUsers(tempUsersHolder);
+          const tempRecipientsHolder = structuredClone(bccRecipients);
+          tempRecipientsHolder.push(userID);
+          setBccRecipients(tempRecipientsHolder);
+        }
+        break;
     }
   };
 
   return (
     users && (
       <form onSubmit={() => {}}>
+        {JSON.stringify(toRecipients)}
+        {JSON.stringify(ccRecipients)}
+        {JSON.stringify(bccRecipients)}
+
         <div className="mb-4">
           <label htmlFor="email" className="sr-only">
             Email
