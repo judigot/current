@@ -146,33 +146,33 @@ export const Form = () => {
 
     //========EXPERIMENTAL========//
     /* Assign state setters to a variable */
-    let tempRecipientsHolder, setFilteredUsers, setRecipients;
-    switch (recipientType) {
-      case "to":
-        {
-          tempRecipientsHolder = structuredClone(toRecipients);
-          setFilteredUsers = setFilteredToUsers; // ?
-          setRecipients = setToRecipients; // ?
-        }
-        break;
-      case "cc":
-        {
-          tempRecipientsHolder = structuredClone(ccRecipients);
-          setFilteredUsers = setFilteredCcUsers; // ?
-          setRecipients = setCcRecipients; // ?
-        }
-        break;
-      case "bcc":
-        {
-          tempRecipientsHolder = structuredClone(bccRecipients);
-          setFilteredUsers = setFilteredBccUsers; // ?
-          setRecipients = setBccRecipients; // ?
-        }
-        break;
-    }
-    tempRecipientsHolder.push(userID);
-    setFilteredUsers(tempUsersHolder); // ?
-    setRecipients(tempRecipientsHolder); // ?
+    // let tempRecipientsHolder, setFilteredUsers, setRecipients;
+    // switch (recipientType) {
+    //   case "to":
+    //     {
+    //       tempRecipientsHolder = structuredClone(toRecipients);
+    //       setFilteredUsers = setFilteredToUsers; // ?
+    //       setRecipients = setToRecipients; // ?
+    //     }
+    //     break;
+    //   case "cc":
+    //     {
+    //       tempRecipientsHolder = structuredClone(ccRecipients);
+    //       setFilteredUsers = setFilteredCcUsers; // ?
+    //       setRecipients = setCcRecipients; // ?
+    //     }
+    //     break;
+    //   case "bcc":
+    //     {
+    //       tempRecipientsHolder = structuredClone(bccRecipients);
+    //       setFilteredUsers = setFilteredBccUsers; // ?
+    //       setRecipients = setBccRecipients; // ?
+    //     }
+    //     break;
+    // }
+    // tempRecipientsHolder.push(userID);
+    // setFilteredUsers(tempUsersHolder); // ?
+    // setRecipients(tempRecipientsHolder); // ?
     //========EXPERIMENTAL========//
 
     switch (recipientType) {
