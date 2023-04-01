@@ -1,4 +1,5 @@
 import React from "react";
+import { Meteor } from "meteor/meteor";
 
 import Recipient from "./Recipient";
 
@@ -6,6 +7,8 @@ import Users from "../getUsers";
 
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
+
+  const [links, setLinks] = React.useState<object[]>();
 
   const [isToFieldEmpty, setIsToFieldEmpty] = React.useState<boolean>(false);
 
@@ -35,6 +38,14 @@ export const Form = () => {
       if (data) {
         setUsers(data);
       }
+
+      Meteor.call("links.getLinks", (err, result) => {
+        if (err) {
+          alert(err);
+        } else {
+          setLinks(result);
+        }
+      });
     })();
   }, []);
 
@@ -297,8 +308,14 @@ export const Form = () => {
         if (subject) data["subject"] = subject;
         if (body) data["body"] = body;
 
-        alert(`Email was successfully sent!\n${JSON.stringify(data, null, 2)}
-        `);
+        alert(`Email was successfully sent!\n${JSON.stringify(data, null, 2)}`);
+        Meteor.call("links.getLinks", (err, result) => {
+          if (err) {
+            alert(err);
+          } else {
+            alert(JSON.stringify(result));
+          }
+        });
       }
 
       if (!subject && !body) {
@@ -320,6 +337,12 @@ export const Form = () => {
           handleSubmit(e);
         }}
       >
+        {links &&
+          links.map((link) => {
+            return <p>{link.title}</p>;
+          })}
+
+        <div></div>
         {isToFieldEmpty && (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"

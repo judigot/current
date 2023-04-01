@@ -1,6 +1,8 @@
 import { Meteor } from "meteor/meteor";
 import { Link, LinksCollection } from "/imports/api/links";
 
+import "../imports/api/LinksMethods";
+
 async function insertLink({ title, url }: Pick<Link, "title" | "url">) {
   await LinksCollection.insertAsync({ title, url, createdAt: new Date() });
 }
@@ -29,9 +31,16 @@ Meteor.startup(async () => {
     });
   }
 
+  (async () => {
+    const links = await LinksCollection.find({});
+    links.map((value) => {
+      console.log(value.title);
+    });
+  })();
+
   // We publish the entire Links collection to all clients.
   // In order to be fetched in real-time to the clients
   Meteor.publish("links", function () {
-    return LinksCollection.find();
+    return LinksCollection.find({});
   });
 });
