@@ -5,10 +5,12 @@ import Recipient from "./Recipient";
 
 import Users from "../getUsers";
 
+import { Mongo } from "meteor/mongo";
+
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
-  const [links, setLinks] = React.useState<object[]>();
+  const [emails, setEmails] = React.useState<any>();
 
   const [isToFieldEmpty, setIsToFieldEmpty] = React.useState<boolean>(false);
 
@@ -39,11 +41,11 @@ export const Form = () => {
         setUsers(data);
       }
 
-      Meteor.call("links.getLinks", (err, result) => {
+      Meteor.call("emails.getAll", (err, result) => {
         if (err) {
           alert(err);
         } else {
-          setLinks(result);
+          setEmails(result);
         }
       });
     })();
@@ -290,7 +292,7 @@ export const Form = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (to.length === 0) {
       setIsToFieldEmpty(true);
@@ -298,7 +300,7 @@ export const Form = () => {
       const subject = subjectRef.current.value;
       const body = bodyRef.current.value;
 
-      if (subject && body) {
+      if (subject || body) {
         const data = {
           to,
         };
@@ -307,15 +309,7 @@ export const Form = () => {
         if (isBccFieldVisible && bcc.length) data["bcc"] = bcc;
         if (subject) data["subject"] = subject;
         if (body) data["body"] = body;
-
-        alert(`Email was successfully sent!\n${JSON.stringify(data, null, 2)}`);
-        Meteor.call("links.getLinks", (err, result) => {
-          if (err) {
-            alert(err);
-          } else {
-            alert(JSON.stringify(result));
-          }
-        });
+        insertEmail(data);
       }
 
       if (!subject && !body) {
@@ -330,6 +324,22 @@ export const Form = () => {
     }
   };
 
+  const insertEmail = async (value: object) => {
+    return await Meteor.call("emails.insert", { value }, (error, result) => {
+      if (error) {
+        alert(error);
+      } else {
+        Meteor.call("emails.getAll", (err, result) => {
+          if (err) {
+            alert(err);
+          } else {
+            setEmails(result);
+          }
+        });
+      }
+    });
+  };
+
   return (
     users && (
       <form
@@ -337,9 +347,9 @@ export const Form = () => {
           handleSubmit(e);
         }}
       >
-        {links &&
-          links.map((link) => {
-            return <p>{link.title}</p>;
+        {emails &&
+          emails.map((email, i) => {
+            return <p key={i}>{JSON.stringify(email.value)}</p>;
           })}
 
         <div></div>

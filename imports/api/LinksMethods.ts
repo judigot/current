@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { LinksCollection, Link } from "./links";
+import { LinksCollection, Link } from "./Links";
 
 Meteor.methods({
   async "links.getLinks"() {
