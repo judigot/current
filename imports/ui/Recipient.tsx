@@ -18,6 +18,35 @@ const Recipient = ({
   // If input field is empty, display all users instead
   const usersSource = inputRef.current?.value ? filteredUsers : allUsers;
 
+  let color: string, bgColor: string;
+
+  switch (recipientType) {
+    case "to":
+      {
+        color = "text-white";
+        bgColor = "bg-indigo-600";
+      }
+      break;
+
+    case "cc":
+      {
+        color = "text-black";
+        bgColor = "bg-[#9EA635]";
+      }
+      break;
+
+    case "bcc":
+      {
+        color = "text-black";
+        bgColor = "bg-[#E8F25A]";
+      }
+      break;
+  }
+
+  console.log(
+    `${color!} ${bgColor!} font-semibold inline-block m-1 p-1 rounded-full text-sm`
+  );
+
   return (
     <div
       className="border-b"
@@ -35,7 +64,7 @@ const Recipient = ({
               return (
                 <div
                   key={i}
-                  className="font-semibold inline-block m-1 p-1 rounded-full text-sm bg-indigo-600 text-white"
+                  className={`${color!} ${bgColor!} font-semibold inline-block m-1 p-1 rounded-full text-sm`}
                 >
                   <div
                     style={{
@@ -127,7 +156,7 @@ const Recipient = ({
         </div>
 
         {(() => {
-          const isValidEmail = (email) => {
+          const isValidEmail = (email: string) => {
             return String(email)
               .toLowerCase()
               .match(

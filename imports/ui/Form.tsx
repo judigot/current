@@ -5,8 +5,6 @@ import Recipient from "./Recipient";
 
 import Users from "../getUsers";
 
-import { Mongo } from "meteor/mongo";
-
 export const Form = () => {
   const [users, setUsers] = React.useState<User[]>();
 
@@ -334,6 +332,13 @@ export const Form = () => {
             alert(err);
           } else {
             setEmails(result);
+
+            // Reset form
+            setTo([]);
+            setCC([]);
+            setBCC([]);
+            subjectRef.current.value = "";
+            bodyRef.current.value = "";
           }
         });
       }
@@ -371,7 +376,7 @@ export const Form = () => {
           </label>
           {
             <Recipient
-              recipientType={"to"}
+              recipientType={"to" as RecipientTypes.to}
               label={"To"}
               inputRef={toRef}
               filteredUsers={filteredToUsers}
@@ -413,7 +418,7 @@ export const Form = () => {
 
           {isCcFieldVisible && (
             <Recipient
-              recipientType={"cc"}
+              recipientType={"cc" as RecipientTypes.cc}
               label={"Cc"}
               inputRef={ccRef}
               filteredUsers={filteredCcUsers}
@@ -444,7 +449,7 @@ export const Form = () => {
 
           {isBccFieldVisible && (
             <Recipient
-              recipientType={"bcc"}
+              recipientType={"bcc" as RecipientTypes.bcc}
               label={"Bcc"}
               inputRef={bccRef}
               filteredUsers={filteredBccUsers}

@@ -27,7 +27,7 @@ declare global {
     };
   }
   interface Recipient {
-    recipientType: string;
+    recipientType: RecipientTypes;
     label: string;
     inputRef: React.useRef;
     filteredUsers: User[] | null;
