@@ -43,10 +43,6 @@ const Recipient = ({
       break;
   }
 
-  console.log(
-    `${color!} ${bgColor!} font-semibold inline-block m-1 p-1 rounded-full text-sm`
-  );
-
   return (
     <div
       className="border-b"
